@@ -1,0 +1,17 @@
+[package]
+name = "userd"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+
+[dependencies]
+serde = { version = "1.0.203", features = ["derive"] }
+toml = "0.8.14"
+argon2 = "0.5.3"
+rand_core = { version = "0.6.4", features = ["getrandom"] }
+linux-ipc = "0.2.1"
+ipc-userd = { path = "ipc-userd" }
