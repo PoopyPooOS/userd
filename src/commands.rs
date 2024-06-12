@@ -15,7 +15,12 @@ impl<'a> Commands<'a> {
     }
 
     pub fn add_user(&self, user: User) -> Result<Response, Error> {
-        println!("[ userd ] add_user {:?}", user);
+        let users = self.user_manager.get_users();
+        if users.iter().any(|user2| user2.username == user.username) {
+            return Err(Error::UserAlreadyExists);
+        }
+
+        self.user_manager.add_user(user);
 
         Ok(Response::Ok)
     }
