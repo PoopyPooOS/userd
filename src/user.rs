@@ -27,4 +27,10 @@ impl UserManager {
 
         toml::from_str::<UserConfig>(&unparsed).expect("Failed to parse users file").user
     }
+
+    pub fn add_user(&self, user: User) {
+        let as_toml = format!("\n\n[[user]]\n{}", toml::to_string_pretty(&user).expect("Failed to serialize user"));
+        let users = fs::read_to_string(&self.config.users_path).expect("Failed to read users file");
+        fs::write(&self.config.users_path, users.trim_end_matches('\n').to_owned() + &as_toml).expect("Failed to write to users file");
+    }
 }

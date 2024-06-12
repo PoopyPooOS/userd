@@ -22,6 +22,7 @@ pub enum Command {
 pub enum Error {
     NoSuchUser,
     WrongPassword,
+    UserAlreadyExists,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -37,12 +38,6 @@ pub struct User {
     pub username: String,
     pub display_name: Option<String>,
     pub password: Option<String>,
-    #[serde(default = "default_shell")]
-    /// The default shell is /sbin/shell
     pub shell: PathBuf,
     pub home: PathBuf,
-}
-
-fn default_shell() -> PathBuf {
-    PathBuf::from("/sbin/shell")
 }
