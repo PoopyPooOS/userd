@@ -12,9 +12,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ipc-macro"
+version = "0.1.0"
+
+[[package]]
 name = "ipc-userd"
 version = "0.1.0"
 dependencies = [
+ "ipc-macro",
  "linux-ipc",
  "serde",
 ]
