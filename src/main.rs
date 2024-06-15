@@ -39,7 +39,8 @@ fn main() {
             Command::RemoveUser(uid) => commands.remove_user(uid),
             Command::SetPassword(uid, original_password, new_password) => commands.set_password(uid, original_password, new_password),
             Command::VerifyPassword(uid, password) => commands.verify_password(uid, password),
-            Command::GetUsers => commands.get_users(),
+            Command::HashPassword(password) => commands.hash_password(password),
+            Command::GetUsers() => commands.get_users(),
         };
 
         reply(result).unwrap_or_else(|err| eprintln!("Failed to reply to client: {:#?}", err));
