@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 linux-ipc = "0.2.1"
 serde = { version = "1.0.203", features = ["derive"] }
+ipc-macro = { path = "../../ipc-macro" }

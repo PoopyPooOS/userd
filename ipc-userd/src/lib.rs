@@ -52,26 +52,18 @@ impl Userd {
             .expect("Failed to send command to userd")
             .expect("Failed to fetch user from userd")
             .map(|result| match result {
-                Response::User(user) => user,
+                Response::FetchUser(user) => user,
                 _ => unreachable!(),
             })
     }
 
     pub fn get_users(&mut self) -> Result<Vec<User>, Error> {
         self.ipc
-            .send::<_, Result<Response, Error>>(Command::GetUsers)
+            .send::<_, Result<Response, Error>>(Command::GetUsers())
             .expect("Failed to send command to userd")
             .expect("Failed to fetch users from userd")
             .map(|result| match result {
-                Response::Vec(users) => {
-                    return users
-                        .iter()
-                        .map(|user| match user {
-                            Response::User(user) => user.clone(),
-                            _ => unreachable!(),
-                        })
-                        .collect::<Vec<User>>()
-                }
+                Response::GetUsers(users) => return users,
                 _ => unreachable!(),
             })
     }
