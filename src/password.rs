@@ -25,6 +25,7 @@ impl<'a> Hasher<'a> {
         self.argon2.verify_password(trimmed, &password_hash)
     }
 
+    #[allow(clippy::unused_self)]
     pub fn is_hash(&self, content: &str) -> bool {
         PasswordHash::new(content.trim_end_matches('\n')).is_ok()
     }
