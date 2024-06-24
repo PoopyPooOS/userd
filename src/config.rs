@@ -6,7 +6,7 @@ pub struct Config {
     pub users_path: PathBuf,
 }
 
-pub fn read_config() -> Config {
+pub fn read() -> Config {
     let config_str = include_str!("../../config.toml");
     toml::from_str::<Config>(config_str).expect("Failed to parse userspace config.")
 }
