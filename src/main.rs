@@ -1,9 +1,8 @@
-use std::fs;
-
 use crate::{commands::Commands, password::Hasher};
 use ipc_userd::{Command, Error, Response, User};
 use linux_ipc::IpcChannel;
 use serde::Deserialize;
+use std::fs;
 
 #[derive(Debug, Deserialize)]
 pub struct UserConfig {
