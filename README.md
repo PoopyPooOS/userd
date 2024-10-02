@@ -6,7 +6,7 @@ This is a very basic daemon that handles user definitions and user authenticatio
 
 - **Simple config:** Unlike other distributions this does not use an /etc/passwd file for defining users.
   
-- **Secure (probably):** Passwords will be encrypted by default but you can also use plain text passwords too.
+- **Secure (probably):** Passwords will be encrypted by default but you can also use plain text passwords.
 
 ## Contributing
 
