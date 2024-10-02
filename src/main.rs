@@ -16,7 +16,7 @@ mod user;
 
 fn main() {
     let user_manager = user::Manager::new();
-    let mut ipc = IpcChannel::new("/tmp/init/services/userd.sock").expect("Failed to create IPC channel");
+    let mut ipc = IpcChannel::new("/tmp/ipc/serviced/userd.sock").expect("Failed to create IPC channel");
     let commands = Commands::new(Hasher::new(), &user_manager);
 
     for user in user_manager.get_users() {
@@ -42,6 +42,6 @@ fn main() {
             Command::GetUsers() => Ok(commands.get_users()),
         };
 
-        reply(result).unwrap_or_else(|err| eprintln!("Failed to reply to client: {err:#?}"));
+        reply(result).unwrap_or_else(|err| eprintln!("Failed to reply to client: {:#?}", err));
     }
 }
