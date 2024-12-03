@@ -7,7 +7,7 @@ pub struct Hasher<'a> {
     argon2: Argon2<'a>,
 }
 
-impl<'a> Hasher<'a> {
+impl Hasher<'_> {
     pub fn new() -> Self {
         Self { argon2: Argon2::default() }
     }

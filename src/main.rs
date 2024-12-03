@@ -1,27 +1,52 @@
-use crate::{commands::Commands, password::Hasher};
-use ipc_userd::{Command, Error, Response, User};
+use ipc_userd::{Command, Error, Response};
 use linux_ipc::IpcChannel;
-use serde::Deserialize;
-use std::fs;
+use logger::{fatal, warn};
+use manager::Manager;
+use nix::{
+    sys::signal::{kill, Signal::SIGUSR1},
+    unistd::Pid,
+};
+use std::{env, fs, process};
 
-#[derive(Debug, Deserialize)]
-pub struct UserConfig {
-    pub user: Vec<User>,
-}
-
-mod commands;
 mod config;
+mod manager;
 mod password;
-mod user;
 
 fn main() {
-    let user_manager = user::Manager::new();
-    let mut ipc = IpcChannel::new("/tmp/ipc/serviced/userd.sock").expect("Failed to create IPC channel");
-    let commands = Commands::new(Hasher::new(), &user_manager);
+    logger::set_app_name!();
+    let serviced_pid = env::var("SERVICED_PID")
+        .unwrap_or_else(|_| {
+            fatal!("SERVICED_PID environment variable not set, was this launched manually?");
+            process::exit(1);
+        })
+        .parse::<i32>()
+        .unwrap_or_else(|_| {
+            fatal!("SERVICED_PID environment variable is not an integer");
+            process::exit(1);
+        });
 
-    for user in user_manager.get_users() {
+    let config = match config::read() {
+        Ok(config) => config,
+        Err(err) => {
+            fatal!(format!("Failed to read config file: {err:#?}"));
+            process::exit(1);
+        }
+    };
+
+    let user_manager = Manager::new(config.users);
+    let mut ipc = IpcChannel::new("/tmp/ipc/services/userd.sock").expect("Failed to create IPC channel");
+
+    for user in &user_manager.users {
         if !user.home.exists() {
             fs::create_dir_all(&user.home).expect("Failed to create user's home directory");
+        }
+    }
+
+    match kill(Pid::from_raw(serviced_pid), SIGUSR1) {
+        Ok(()) => (),
+        Err(err) => {
+            warn!(format!("Failed to send ready signal to serviced: {err:#?}"));
+            process::exit(1);
         }
     }
 
@@ -30,18 +55,16 @@ fn main() {
             .receive::<Command, Result<Response, Error>>()
             .expect("Failed to receive content from IPC channel");
 
-        // send ready message to init here because the service is now listening for messages
-
         let result = match received {
-            Command::FetchUser(username) => commands.fetch_user(&username),
-            Command::AddUser(user) => commands.add_user(&user),
-            Command::RemoveUser(uid) => commands.remove_user(uid),
-            Command::SetPassword(uid, original_password, new_password) => commands.set_password(uid, &original_password, &new_password),
-            Command::VerifyPassword(uid, password) => commands.verify_password(uid, &password),
-            Command::HashPassword(password) => Ok(commands.hash_password(&password)),
-            Command::GetUsers() => Ok(commands.get_users()),
+            Command::FetchUser(username) => user_manager.fetch_user(&username),
+            Command::AddUser(user) => user_manager.add_user(&user),
+            Command::RemoveUser(uid) => user_manager.remove_user(uid),
+            Command::SetPassword(uid, original_password, new_password) => user_manager.set_password(uid, &original_password, &new_password),
+            Command::VerifyPassword(uid, password) => user_manager.verify_password(uid, &password),
+            Command::HashPassword(password) => Ok(user_manager.hash_password(&password)),
+            Command::GetUsers() => Ok(user_manager.get_users()),
         };
 
-        reply(result).unwrap_or_else(|err| eprintln!("Failed to reply to client: {:#?}", err));
+        reply(result).unwrap_or_else(|err| eprintln!("Failed to reply to client: {err:#?}"));
     }
 }

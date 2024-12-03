@@ -22,6 +22,7 @@ pub enum Error {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct User {
     pub uid: u32,
+    #[serde(skip)]
     pub username: String,
     pub display_name: Option<String>,
     pub password: Option<String>,
