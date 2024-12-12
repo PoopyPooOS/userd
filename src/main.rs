@@ -1,5 +1,5 @@
-use ipc_userd::{Command, Error, Response};
-use linux_ipc::IpcChannel;
+use ipc::{IpcError, Server};
+use ipc_userd::Command;
 use logger::{fatal, warn};
 use manager::Manager;
 use nix::{
@@ -12,7 +12,7 @@ mod config;
 mod manager;
 mod password;
 
-fn main() {
+fn main() -> Result<(), IpcError> {
     logger::set_app_name!();
     let serviced_pid = env::var("SERVICED_PID")
         .unwrap_or_else(|_| {
@@ -34,7 +34,7 @@ fn main() {
     };
 
     let user_manager = Manager::new(config.users);
-    let mut ipc = IpcChannel::new("/tmp/ipc/services/userd.sock").expect("Failed to create IPC channel");
+    let ipc = Server::new("/tmp/ipc/services/userd.sock")?;
 
     for user in &user_manager.users {
         if !user.home.exists() {
@@ -50,12 +50,9 @@ fn main() {
         }
     }
 
-    loop {
-        let (received, reply) = ipc
-            .receive::<Command, Result<Response, Error>>()
-            .expect("Failed to receive content from IPC channel");
-
-        let result = match received {
+    ipc.on_client(move |mut client| loop {
+        let command = client.receive::<Command>()?;
+        let result = match command {
             Command::FetchUser(username) => user_manager.fetch_user(&username),
             Command::AddUser(user) => user_manager.add_user(&user),
             Command::RemoveUser(uid) => user_manager.remove_user(uid),
@@ -65,6 +62,6 @@ fn main() {
             Command::GetUsers() => Ok(user_manager.get_users()),
         };
 
-        reply(result).unwrap_or_else(|err| eprintln!("Failed to reply to client: {err:#?}"));
-    }
+        client.send(result)?;
+    })
 }

@@ -1,11 +1,11 @@
 #![allow(unused_variables)]
-use std::collections::HashMap;
 
 use crate::password::Hasher;
 use ipc_userd::{Error, Response, User};
 use logger::info;
+use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Manager<'a> {
     pub hasher: Hasher<'a>,
     pub users: Vec<User>,

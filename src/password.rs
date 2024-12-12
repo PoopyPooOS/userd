@@ -2,7 +2,8 @@ use argon2::{
     password_hash::{self, rand_core::OsRng, PasswordHash, PasswordHasher, SaltString},
     Argon2, PasswordVerifier,
 };
-#[derive(Debug)]
+
+#[derive(Debug, Clone)]
 pub struct Hasher<'a> {
     argon2: Argon2<'a>,
 }

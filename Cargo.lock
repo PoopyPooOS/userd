@@ -127,6 +127,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ipc"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "logger",
+ "serde",
+]
+
+[[package]]
 name = "ipc-macro"
 version = "0.1.0"
 
@@ -134,8 +143,8 @@ version = "0.1.0"
 name = "ipc-userd"
 version = "0.1.0"
 dependencies = [
+ "ipc",
  "ipc-macro",
- "linux-ipc",
  "serde",
 ]
 
@@ -150,16 +159,6 @@ name = "libc"
 version = "0.2.167"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09d6582e104315a817dff97f75133544b2e094ee22447d2acf4a74e189ba06fc"
-
-[[package]]
-name = "linux-ipc"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "317833a19c40e99a8c1fb4a0d54b3da6a27fb073b6dd17a029f85becf0ab5539"
-dependencies = [
- "bincode",
- "serde",
-]
 
 [[package]]
 name = "logger"
@@ -280,8 +279,8 @@ name = "userd"
 version = "0.1.0"
 dependencies = [
  "argon2",
+ "ipc",
  "ipc-userd",
- "linux-ipc",
  "logger",
  "nix",
  "rand_core",

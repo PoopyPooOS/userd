@@ -1,3 +1,4 @@
+use ipc::IpcError;
 use ipc_macro::define_commands;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -17,6 +18,13 @@ pub enum Error {
     NoSuchUser,
     WrongPassword,
     UserAlreadyExists,
+    IpcError(IpcError),
+}
+
+impl From<IpcError> for Error {
+    fn from(value: IpcError) -> Self {
+        Self::IpcError(value)
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
