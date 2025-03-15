@@ -1,8 +1,8 @@
 use ipc_userd::User;
-use logger::{make_fatal, Log};
+use logger::{Log, make_fatal};
 use serde::Deserialize;
-use std::{collections::HashMap, fs};
-use tl::eval;
+use std::{collections::HashMap, path::PathBuf};
+use tl::{Source, eval};
 
 #[derive(Debug, Deserialize)]
 pub struct PartialConfig {
@@ -10,13 +10,23 @@ pub struct PartialConfig {
 }
 
 pub fn read() -> Result<PartialConfig, Box<Log>> {
-    match eval::<PartialConfig>(
-        fs::read_to_string("/system/config.tl")
-            .map_err(|_| Box::new(make_fatal!("Failed to read config file", hint: "Check if /system/config.tl exists")))?,
-    )? {
+    let source = match Source::from_path(PathBuf::from("/config/system.tl")) {
+        Ok(source) => source,
+        Err(err) => {
+            let err = make_fatal!(
+                hint: "Check if '/system/config.tl' exists",
+                "Failed to read config file: {err}"
+            );
+
+            return Err(Box::new(err));
+        }
+    };
+
+    match eval::<PartialConfig>(source)? {
         Some(config) => Ok(config),
-        None => Err(Box::new(
-            make_fatal!("Failed to evaluate config file", hint: "Check if /system/config.tl is valid"),
-        )),
+        None => Err(Box::new(make_fatal!(
+            hint: "Check if /system/config.tl is valid",
+            "Failed to evaluate config file"
+        ))),
     }
 }

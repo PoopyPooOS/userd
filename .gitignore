@@ -1,3 +1,2 @@
-/target
-/ipc-userd/target
+/.helix
 /ipc-userd/Cargo.lock

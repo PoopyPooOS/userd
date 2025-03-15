@@ -29,21 +29,26 @@ impl Manager<'_> {
 
     #[allow(clippy::unnecessary_wraps, clippy::unused_self)]
     pub fn add_user(&self, user: &User) -> Result<Response, Error> {
-        info!(format!("[ userd ] add_user {user:#?}"));
+        info!("[ userd ] add_user {user:#?}");
 
         Ok(Response::AddUser(()))
     }
 
     #[allow(clippy::unused_self, clippy::unnecessary_wraps)]
     pub fn remove_user(&self, uid: u32) -> Result<Response, Error> {
-        info!(format!("[ userd ] remove_user {uid}"));
+        info!("[ userd ] remove_user {uid}");
 
         Ok(Response::RemoveUser(()))
     }
 
     #[allow(clippy::unused_self, clippy::unnecessary_wraps)]
-    pub fn set_password(&self, uid: u32, original_password: &str, new_password: &str) -> Result<Response, Error> {
-        info!(format!("[ userd ] set_password {uid} {original_password} {new_password}"));
+    pub fn set_password(
+        &self,
+        uid: u32,
+        original_password: &str,
+        new_password: &str,
+    ) -> Result<Response, Error> {
+        info!("[ userd ] set_password {uid} {original_password} {new_password}");
 
         Ok(Response::SetPassword(()))
     }
@@ -99,6 +104,10 @@ impl Manager<'_> {
     }
 
     fn fetch_user_by_uid(&self, uid: u32) -> Result<User, Error> {
-        self.users.iter().find(|user| user.uid == uid).cloned().ok_or(Error::NoSuchUser)
+        self.users
+            .iter()
+            .find(|user| user.uid == uid)
+            .cloned()
+            .ok_or(Error::NoSuchUser)
     }
 }

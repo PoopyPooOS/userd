@@ -1,7 +1,7 @@
-use ipc::IpcError;
-use ipc_macro::define_commands;
+use ipc::{IpcError, define_commands};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use thiserror::Error;
 
 define_commands! {
     FetchUser(String) -> User;
@@ -13,20 +13,6 @@ define_commands! {
     SetPassword(u32, String, String) -> ();
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub enum Error {
-    NoSuchUser,
-    WrongPassword,
-    UserAlreadyExists,
-    IpcError(IpcError),
-}
-
-impl From<IpcError> for Error {
-    fn from(value: IpcError) -> Self {
-        Self::IpcError(value)
-    }
-}
-
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct User {
     pub uid: u32,
@@ -36,4 +22,16 @@ pub struct User {
     pub password: Option<String>,
     pub shell: PathBuf,
     pub home: PathBuf,
+}
+
+#[derive(Debug, Error, Deserialize, Serialize)]
+pub enum Error {
+    #[error("No such user")]
+    NoSuchUser,
+    #[error("Wrong password")]
+    WrongPassword,
+    #[error("User already exists")]
+    UserAlreadyExists,
+    #[error("IPC Error: {0}")]
+    IpcError(#[from] IpcError),
 }

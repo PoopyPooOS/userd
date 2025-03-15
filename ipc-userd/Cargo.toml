@@ -1,9 +1,13 @@
 [package]
 name = "ipc-userd"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-serde = { version = "1.0.205", features = ["derive"] }
-ipc-macro = { path = "../../ipc-macro" }
-ipc = { path = "../../ipc" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+ipc = { workspace = true }
+
+[lints]
+workspace = true
