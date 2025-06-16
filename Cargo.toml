@@ -1,19 +1,23 @@
 [package]
 name = "userd"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
-serde = { workspace = true }
-rand_core = { workspace = true }
-argon2 = { workspace = true }
-ipc-userd = { workspace = true }
+prelude.workspace = true
+serviced.workspace = true
+ipc.workspace = true
+tl.workspace = true
+
+# Serializing
+serde.workspace = true
+
+# OS APIs
 rustix = { workspace = true, features = ["process"] }
 
-tl = { workspace = true }
-logger = { workspace = true }
-ipc = { workspace = true }
-ipc-serviced = { workspace = true }
+# Encryption
+argon2.workspace = true
+rand_core.workspace = true
 
 [lints]
 workspace = true

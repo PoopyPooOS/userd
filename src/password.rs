@@ -1,6 +1,6 @@
 use argon2::{
+    password_hash::{self, rand_core::OsRng, PasswordHash, PasswordHasher, SaltString},
     Argon2, PasswordVerifier,
-    password_hash::{self, PasswordHash, PasswordHasher, SaltString, rand_core::OsRng},
 };
 
 /// Wrapper around [`argon2::Argon2`]
@@ -25,7 +25,6 @@ impl Hasher<'_> {
         self.0.verify_password(trimmed, &password_hash)
     }
 
-    #[allow(clippy::unused_self)]
     pub fn is_hash(&self, content: &str) -> bool {
         PasswordHash::new(content.trim_end_matches('\n')).is_ok()
     }

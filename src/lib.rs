@@ -1,8 +1,8 @@
 use ipc::{Client, IpcError};
 use std::path::Path;
-pub use types::*;
 
-pub mod types;
+mod types;
+pub use types::*;
 
 pub struct Userd {
     ipc: Client,
@@ -61,7 +61,7 @@ impl Userd {
     }
 
     pub fn get_users(&mut self) -> Result<Vec<User>, Error> {
-        self.ipc.send(Command::GetUsers())?;
+        self.ipc.send(Command::GetUsers)?;
         self.ipc
             .receive::<Result<Response, Error>>()?
             .map(|response| match response {
